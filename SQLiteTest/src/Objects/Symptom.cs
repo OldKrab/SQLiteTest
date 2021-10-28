@@ -8,6 +8,6 @@ namespace SQLiteTest.Objects
     {
         public int SymptomId { get; set; }
         public string Name { get; set; }
-        public List<Disease> Diseases { get; } = new List<Disease>();
+        public List<Disease> Diseases { get; set; } = new List<Disease>();
     }
 }

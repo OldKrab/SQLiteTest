@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿using System.Collections.Generic;
+using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
 using Microsoft.EntityFrameworkCore;
@@ -13,7 +14,6 @@ namespace SQLiteTest
     public partial class MainWindow : Window
     {
         private TestContext db = new TestContext();
-        private BindingList<Symptom> bindingList;
         public MainWindow()
         {
             InitializeComponent();
@@ -34,11 +34,33 @@ namespace SQLiteTest
 
         private void OnDeleteSymptomButtonClick(object sender, RoutedEventArgs e)
         {
-            var symptom = SymptomsTable.SelectedItem;
-            if (symptom is Symptom)
+            var selectedItem = SymptomsTable.SelectedItem;
+            if (selectedItem is Symptom)
             {
+                var symptom = selectedItem as Symptom;
                 db.Remove(symptom);
                 db.SaveChanges();
+            }
+        }
+
+        private void OnEditSymptomButtonClick(object sender, RoutedEventArgs e)
+        {
+            var selectedItem = SymptomsTable.SelectedItem;
+            if (selectedItem is Symptom symptom)
+            {
+                var symptomWindow = new SymptomWindow(new Symptom
+                {
+                    SymptomId = symptom.SymptomId,
+                    Name = symptom.Name,
+                    Diseases = new List<Disease>(symptom.Diseases)
+                });
+                if (symptomWindow.ShowDialog() == true)
+                {
+                    symptom.Name = symptomWindow.Symptom.Name;
+                    symptom.Diseases = symptomWindow.Symptom.Diseases;
+                    db.SaveChanges();
+                    SymptomsTable.Items.Refresh();
+                }
             }
         }
     }
